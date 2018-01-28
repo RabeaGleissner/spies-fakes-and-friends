@@ -30,12 +30,14 @@
         </section>
         <section>
           <h2>Rabea Gleissner</h2>
-          <h3 class ="fragment">Software developer at <img style="width:150px;margin-bottom:0;"  src="8l-logo-black.png" alt="8l-logo"></h3>
+          <h3 class ="fragment">Software developer </h3>
+          <div class="fragment"><img style="width:150px;margin-bottom:0;"  src="8l-logo-black.png" alt="8l-logo"></div>
           <h3 class ="fragment">@aebaR on Twitter</h3>
           <aside class="notes" data-markdown>
             - 8th Light is a software consulting company
             - we build custom software for our clients - anything from mobile applications to microservices
-            - I have to put it out there right now: I'm a Rubyist at heart but I figured that this topic would work for any language really
+            - I have to put it out there right now: I'm a Rubyist at heart
+            - But I figured that this topic would work for any language really
             - and of course all my code exampels are in JavaScript
           </aside>
         </section>
@@ -43,58 +45,54 @@
         <section>
           <h2>TDD is not always easy</h2>
           <aside class="notes" data-markdown>
-            - when I first learnt how to test drive my code, there were some tests that seemed quite straight forward and some that seemed always impossible to do
+            - when I first learnt how to test drive my code, there were some tests that seemed quite straight forward and some that seemed almost impossible to do
           </aside>
         </section>
 
         <section>
-          <p>I mean, this one seems ok, doesn't it?</p>
+          <h3>Here's one that is quite straight foward...</h3>
           <aside class="notes" data-markdown>
           </aside>
         </section>
 
         <section>
           <pre><code>
-        // production code
-
-        class FizzBuzz {
-          generate(number) {
-            if (number % 3 === 0) {
-              return 'fizz'
-            } else if (number % 5 === 0) {
-              return 'buzz'
-            }
-            return number
-          }
+    class FizzBuzz {
+      generate(number) {
+        if (number % 3 === 0) {
+          return 'fizz'
+        } else if (number % 5 === 0) {
+          return 'buzz'
         }
+        return number
+      }
+    }
 
-        // test
+    describe('FizzBuzz', () => {
+      let fizzBuzz
 
-        describe('FizzBuzz', () => {
+      beforeEach(() => {
+        fizzBuzz = new FizzBuzz()
+      })
 
-          let fizzBuzz
+      it('returns the number for no fizzbuzz', () => {
+        expect(fizzBuzz.generate(2)).toEqual(2)
+      })
 
-          beforeEach(() => {
-            fizzBuzz = new FizzBuzz()
-          })
+      it('returns "fizz" for 3', () => {
+        expect(fizzBuzz.generate(3)).toEqual('fizz')
+      })
 
-          it('returns the number for no fizzbuzz', () => {
-            expect(fizzBuzz.generate(2)).toEqual(2)
-          })
-
-          it('returns "fizz" for 3', () => {
-            expect(fizzBuzz.generate(3)).toEqual('fizz')
-          })
-
-          it('returns "buzz" for 5', () => {
-            expect(fizzBuzz.generate(5)).toEqual('buzz')
-          })
-        })
+      it('returns "buzz" for 5', () => {
+        expect(fizzBuzz.generate(5)).toEqual('buzz')
+      })
+    })
           </code></pre>
         </section>
 
         <section>
-          <p>Pure functions are easy to test. And so are classes with few dependencies.</p>
+          <p>Pure functions are easy to test.</p>
+          <p>And so are classes with few dependencies.</p>
           <aside class="notes" data-markdown>
             - a pure function is a function that has no side effects.
             - that has a very clear relationship between input and output
@@ -105,20 +103,20 @@
         <section>
           <p>What about this one?</p>
           <pre><code>
-          export default class RockPaperScissors {
-            constructor(ui, humanPlayer, computerPlayer) {
-              this.ui = ui
-              this.humanPlayer = humanPlayer
-              this.computerPlayer = computerPlayer
-            }
-
-            run() {
-              this.ui.greet()
-              this.play()
-            }
-
-            // some more code
+        export default class RockPaperScissors {
+          constructor(ui, humanPlayer, computerPlayer) {
+            this.ui = ui
+            this.humanPlayer = humanPlayer
+            this.computerPlayer = computerPlayer
           }
+
+          run() {
+            this.ui.greet()
+            this.play()
+          }
+
+          // ...
+        }
           </code></pre>
           <aside class="notes" data-markdown>
             - look at the constructor of this class
@@ -130,11 +128,13 @@
         <section>
           <p>But when we look at this...</p>
           <pre><code>
-          const consoleInput = require('prompt-sync')()
-          const consoleOutput = console
-          const ui = new Ui(consoleInput, consoleOutput)
-          const game = new RockPaperScissors(ui, new HumanPlayer(ui), new ComputerPlayer())
-          game.run()
+  const consoleInput = require('prompt-sync')()
+  const consoleOutput = console
+  const ui = new Ui(consoleInput, consoleOutput)
+  const game = new RockPaperScissors(ui,
+                                     new HumanPlayer(ui),
+                                     new ComputerPlayer())
+  game.run()
           </code></pre>
           <aside class="notes" data-markdown>
             - turns out that the Ui has some dependencies too
@@ -150,11 +150,13 @@
         <section>
           <p>Or what about this one?</p>
           <pre><code>
-            fetchData() {
-              const url = `${urlPrefix}?criteria=${this.filterCriteria()}`
-              return window.fetch(url, {credentials: 'same-origin', cache: 'no-store' })
-                .then(result => result.json())
-            }
+fetchData() {
+  const url = `${urlPrefix}?criteria=${this.filterCriteria()}`
+  return window.fetch(url,
+                      {credentials: 'same-origin',
+                       cache: 'no-store'}
+                     ).then(result => result.json())
+}
           </code></pre>
           <aside class="notes" data-markdown>
             - let's say you want to test that the fetch call was made with the correct url
@@ -179,7 +181,7 @@
         <section>
           <h2>What is a test double?</h2>
           <ul>
-            <li class="fragment">An object that stand in for your production code objects in tests</li>
+            <li class="fragment">An object that stands in for your production code objects in tests</li>
             <li class="fragment">Needs to conform to the interface of the required collaborator</li>
           </ul>
           <aside class="notes" data-markdown>
@@ -189,11 +191,10 @@
         <section>
           <h2>Why do we use them?</h2>
           <ul>
-            <li class="fragment">Can make impure functions pure</li>
-            <li class="fragment">Can reduce the amount of dependencies</li>
-            <li class="fragment">Reduce the amount of dependencies in tests</li>
-            <li class="fragment">Make tests less fragile</li>
-            <li class="fragment">Can force our code to run certain branches</li>
+            <li class="fragment">To reduce the amount of dependencies</li>
+            <li class="fragment">To make impure functions pure</li>
+            <li class="fragment">To make tests less fragile</li>
+            <li class="fragment">To force our code to execute certain branches</li>
           </ul>
           <aside class="notes" data-markdown>
           </aside>
@@ -201,15 +202,31 @@
 
         <section>
           <p>Let's look at one of our examples again.</p>
+          <pre><code>
+  const consoleInput = require('prompt-sync')()
+  const consoleOutput = console
+  const ui = new Ui(consoleInput, consoleOutput)
+  const game = new RockPaperScissors(ui,
+                                     new HumanPlayer(ui),
+                                     new ComputerPlayer())
+  game.run()
+          </code></pre>
+          <aside class="notes">
+            - in this case the Ui is the trouble some collaborator
+            - but we can replace the Ui with a test double
+          </aside>
         </section>
 
         <section>
+          <p>Rock, Paper, Scissors with test doubles</p>
           <pre><code>
-          const uiDouble = new UiDouble(false)
-          const fakeComputer = new FakePlayer('rock', null)
-          const fakeHuman = new FakePlayer('paper', ['n'])
-          const game = new RockPaperScissors(uiDouble, fakeHuman, fakeComputer)
-          game.run()
+  const uiDouble = new UiDouble(false)
+  const fakeComputer = new FakePlayer('rock', null)
+  const fakeHuman = new FakePlayer('paper', ['n'])
+  const game = new RockPaperScissors(uiDouble,
+                                     fakeHuman,
+                                     fakeComputer)
+  game.run()
           </code></pre>
           <aside class="notes" data-markdown>
             - this time using a test double
@@ -240,7 +257,7 @@
             <li>Fake</li>
           </ul>
           <aside class="notes" data-markdown>
-            - there are different types of test doubles
+            - these are the types of test doubles that I'll cover today
           </aside>
         </section>
         <section>
@@ -254,16 +271,15 @@
           </aside>
         </section>
         <section>
-          <h2>The nitty gritty</h2>
-          <aside class="notes">
-            - let's get into the nitty gritty
+          <h3>Rock, Paper, Scissors</h3>
+          <aside class="notes" data-markdown>
+            - but before we get into the nitty gritty, I need to show you something I've prepared for today
           </aside>
         </section>
-
         <section>
           <h3>Dummy</h3>
           <ul>
-            <li>Implements functions that are called</li>
+            <li>Implements any functions that are called</li>
             <li>Usually empty function body</li>
             <li>Unless it has to return something</li>
           </ul>
@@ -275,7 +291,6 @@
             - then return null
           </aside>
         </section>
-
         <section>
           <h3>Dummy example</h3>
           <pre><code>
@@ -288,17 +303,9 @@
           </code></pre>
           <aside class="notes">
             - here's an example from my Rock Paper Scissors game
-            - when I test the class that runs the game and brings all the dependencies together, I need to inject the UI
-            - but it doesn't need to do anything - although its methods are called
-            - show in code
-          </aside>
-          <pre><code>
-          </code></pre>
-          <aside class="notes">
-            - here's an example form my Rock Paper Scissors game
+            - in fact, it might be easier to show this in the code
           </aside>
         </section>
-
         <section>
           <h3>Stub</h3>
           <ul>
@@ -307,12 +314,8 @@
             <li>Can force code to run along specific paths</li>
           </ul>
           <aside class="notes">
-            - this is the second most simple test double
-            - it returns something but it doesn't contain any business logic
-            - if used in an if/else statement for example, it can be a way to force the code to run certain branches
           </aside>
         </section>
-
         <section>
           <h3>Stub example</h3>
           <pre><code>
@@ -351,73 +354,64 @@
             - which has two more dependencies, one being a command line input prompt
           </aside>
         </section>
-
         <section>
           <h3>Spy</h3>
           <ul>
             <li>Records some information</li>
             <li>To check if a method was called</li>
-            <li>Or how many times it was called</li>
+            <li>How many times a method was called</li>
             <li>Number of method arguments</li>
-            <li>Could also return method arguments</li>
+            <li>Check that the arguments are correct</li>
           </ul>
           <aside class="notes">
             - it reports back as to what the code has done to it
             - for example if it was called or how many times it was called
             - and this is why naming is important:
-              - if it returns something like the number of arguments, you want to make sure people know that it's not a stub
+            - if it returns something like the number of arguments, you want to make sure people know that it's not a stub
           </aside>
         </section>
 
         <section>
           <h3>Spy example</h3>
           <pre><code>
-          export default class Ui {
-            constructor(input, output) {
-              this.input = input
-              this.output = output
-            }
+      export default class Ui {
+        constructor(input, output) {
+          this.input = input
+          this.output = output
+        }
 
-            greet() {
-              this.output.log('::: Welcome to Rock Paper Scissors :::\n')
-            }
-          }
+        greet() {
+          this.output.log('Welcome')
+        }
+      }
 
-          // Test
-          it('greets the user', () => {
-            const outputSpy = new OutputSpy()
-            const ui = new Ui(inputSpy, outputSpy)
-            ui.greet()
-            expect(outputSpy.printedMessage()).
-              toEqual('::: Welcome to Rock Paper Scissors :::\n')
-          })
+      it('greets the user', () => {
+        const outputSpy = new OutputSpy()
+        const ui = new Ui(inputSpy, outputSpy)
+        ui.greet()
+        expect(outputSpy.printedMessage()).
+          toEqual('Welcome')
+      })
 
-          class OutputSpy {
-            constructor() {
-              this.message = ''
-            }
+      class OutputSpy {
+        constructor() {
+          this.message = ''
+        }
 
-            log(message) {
-              this.message = message
-            }
+        log(message) {
+          this.message = message
+        }
 
-            printedMessage() {
-              return this.message
-            }
-          }
+        printedMessage() {
+          return this.message
+        }
+      }
           </code></pre>
           <aside class="notes">
             - let's say we want to test that the Ui class prints the welcome message
             - for the production code we're passing in console
             - but in the test we're passing in a spy
             - that can tell us if a method was called with the correct argument
-          </aside>
-        </section>
-
-        <section>
-          <h3>Jasmine example</h3>
-          <aside class="notes">
-            - in Jasmine we can use toHaveBeenCalled
           </aside>
         </section>
 
@@ -452,7 +446,6 @@
             - sometimes we even write tests for fakes if they have logic
           </aside>
         </section>
-
         <section>
           <h3>Fake example</h3>
           <pre><code>
@@ -481,7 +474,6 @@
             - but it's probably easier if I show you directly in the code
           </aside>
         </section>
-
         <section>
           <h3>Double</h3>
           <ul>
@@ -493,30 +485,30 @@
             - in that case I would give it the generic term double
           </aside>
         </section>
-
-        <!--not sure where to put this yet-->
         <section>
           <p>Please note: this is not quite so easy with typed languages.</p>
-          <aside>
-            - do we have any fans of typescript in the room?
-            - anyone who has used typescript but is not a fan?
-            - ok, so there is some knowledge about it...
+          <aside class="notes">
+            - do we have any fans of TypeScript in the room?
+            - anyone who has used TypeScript but is not a fan?
           </aside>
         </section>
-
         <section>
-          <h2>Summary</h2>
-          <ul>
-            <li>test doubles make our life a lot easier</li>
-            <li>they eliminate dependencies</li>
-            <li>make functions pure so they're easier to test</li>
-            <li>different types</li>
-          </ul>
-          <aside class="notes"></aside>
+          <h3>Test frameworks have all this inbuilt</h3>
+          <aside class="notes">
+            - I don't write my own test doubles all the time
+            - but I thought it would be interesting to demo this in this presentation
+            - normally I use the spies and fakes and what not that Jasmine provides
+            - but hopefully this has helped you to understand better what's happening under the hood
+          </aside>
         </section>
-
         <section>
-          <aside class="notes"></aside>
+          <h2>Thank you!</h2>
+          <p>@aebaR</p>
+          <aside class="notes">
+            - thank you for listening!
+            - if you have any questions, find me afterwards
+            - or tweet me
+          </aside>
         </section>
 			</div>
 		</div>
@@ -525,9 +517,6 @@
 		<script src="js/reveal.js"></script>
 
 		<script>
-			// More info about config & dependencies:
-			// - https://github.com/hakimel/reveal.js#configuration
-			// - https://github.com/hakimel/reveal.js#dependencies
 			Reveal.initialize({
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
