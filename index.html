@@ -3,15 +3,11 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 		<title>reveal.js</title>
-
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/black.css">
-
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
-
 		<!-- Printing and PDF exports -->
 		<script>
 			var link = document.createElement( 'link' );
@@ -67,10 +63,13 @@
         return number
       }
     }
+          </code></pre>
+        </section>
 
+        <section>
+          <pre><code>
     describe('FizzBuzz', () => {
       let fizzBuzz
-
       beforeEach(() => {
         fizzBuzz = new FizzBuzz()
       })
@@ -87,7 +86,7 @@
         expect(fizzBuzz.generate(5)).toEqual('buzz')
       })
     })
-          </code></pre>
+          </code> </pre>
         </section>
 
         <section>
@@ -140,10 +139,6 @@
             - turns out that the Ui has some dependencies too
             - so now we're up to five dependencies
             - and the HumanPlayer is dependent on the ui as well
-            - obviously this is just a little illustrative example
-            - but you can see how dependencies can soon become quite a lot
-            - and do you really want to instantiate all of those in your tests when all you want to test is the RockPaperScissors class?
-            - spoiler alert, the answer is no...
           </aside>
         </section>
 
@@ -151,7 +146,7 @@
           <p>Or what about this one?</p>
           <pre><code>
 fetchData() {
-  const url = `${urlPrefix}?criteria=${this.filterCriteria()}`
+  const url = `${url}?criteria=${this.filterCriteria()}`
   return window.fetch(url,
                       {credentials: 'same-origin',
                        cache: 'no-store'}
@@ -172,9 +167,6 @@ fetchData() {
           <h3>And that is why we use...</h3>
           <h2 class="fragment"> 🎉 Test doubles 🎉 </h2>
           <aside class="notes" data-markdown>
-            - when I first came across this concept, my mind was blown
-            - but before I delve into the main part of this presentation
-            - here's something I prepared earlier for you
           </aside>
         </section>
 
@@ -212,40 +204,53 @@ fetchData() {
   game.run()
           </code></pre>
           <aside class="notes">
-            - in this case the Ui is the trouble some collaborator
+            - in this case the Ui is the troublesome collaborator
             - but we can replace the Ui with a test double
           </aside>
         </section>
 
         <section>
-          <p>Rock, Paper, Scissors with test doubles</p>
+          <p>Without test doubles</p>
           <pre><code>
-  const uiDouble = new UiDouble(false)
-  const fakeComputer = new FakePlayer('rock', null)
-  const fakeHuman = new FakePlayer('paper', ['n'])
-  const game = new RockPaperScissors(uiDouble,
-                                     fakeHuman,
-                                     fakeComputer)
-  game.run()
+  it('plays game', () => {
+    const consoleInput = require('prompt-sync')()
+    const consoleOutput = console
+    const ui = new Ui(consoleInput, consoleOutput)
+    const game = new RockPaperScissors(ui,
+                                       new HumanPlayer(ui),
+                                       new ComputerPlayer())
+
+    game.run()
+
+    expect('???').toEqual('???')
+    })
           </code></pre>
           <aside class="notes" data-markdown>
-            - this time using a test double
-            - a bit easier
-            - only one type of human player necessary
-            - you can already guess that we're forcing our players to play a certain move
-            - no dependencies for the ui
+            - let's see how we can write a test for this without using test doubles
+            - I don't even know what I can assert on here
           </aside>
         </section>
 
-        <!--<section>-->
-          <!--<p>Or this one.</p>-->
-          <!--<pre><code>-->
-            <!--//example with API call-->
-          <!--</code></pre>-->
-          <!--<aside class="notes" data-markdown>-->
-            <!--- suddenly we are able to test the functionality-->
-          <!--</aside>-->
-        <!--</section>-->
+        <section>
+          <p>With test doubles</p>
+          <pre><code>
+    it('plays game', () => {
+      const uiDummy = new UiDummy()
+      const fakePlayer = new FakePlayer('paper', ['n'])
+      const game = new RockPaperScissors(uiDummy,
+                                         fakePlayer,
+                                         fakePlayer)
+
+      game.run()
+
+      expect(fakePlayer.makeMoveCallCount()).toEqual(2)
+    })
+          </code></pre>
+          <aside class="notes" data-markdown>
+            - reduced the dependencies a lot
+            - and we have something to assert on
+          </aside>
+        </section>
 
         <section>
           <h2>Types of test doubles</h2>
@@ -253,13 +258,13 @@ fetchData() {
             <li>Dummy</li>
             <li>Stub</li>
             <li>Spy</li>
-            <!--<li>Mock</li>-->
             <li>Fake</li>
           </ul>
           <aside class="notes" data-markdown>
             - these are the types of test doubles that I'll cover today
           </aside>
         </section>
+
         <section>
           <h2>Why does this differentiation matter?</h2>
           <aside class="notes">
@@ -270,12 +275,13 @@ fetchData() {
             - but if you implement your own, it's good practise to be precise with naming
           </aside>
         </section>
+
         <section>
           <h3>Rock, Paper, Scissors</h3>
           <aside class="notes" data-markdown>
-            - but before we get into the nitty gritty, I need to show you something I've prepared for today
           </aside>
         </section>
+
         <section>
           <h3>Dummy</h3>
           <ul>
@@ -287,10 +293,10 @@ fetchData() {
             - implements functions that are called by the method under test
             - it's just an empty function
             - we don't care what it does or returns
-            - unless we're using a typed language like TypeScript and the method signature requires a return
-            - then return null
+            - unless we're using a typed language and the method signature requires a return
           </aside>
         </section>
+
         <section>
           <h3>Dummy example</h3>
           <pre><code>
@@ -306,16 +312,18 @@ fetchData() {
             - in fact, it might be easier to show this in the code
           </aside>
         </section>
+
         <section>
           <h3>Stub</h3>
           <ul>
-            <li>Simplified implemenation of a method</li>
+            <li>Simplified implementation of a method</li>
             <li>Returns a value but without business logic</li>
             <li>Can force code to run along specific paths</li>
           </ul>
           <aside class="notes">
           </aside>
         </section>
+
         <section>
           <h3>Stub example</h3>
           <pre><code>
@@ -354,6 +362,7 @@ fetchData() {
             - which has two more dependencies, one being a command line input prompt
           </aside>
         </section>
+
         <section>
           <h3>Spy</h3>
           <ul>
@@ -388,7 +397,9 @@ fetchData() {
       it('greets the user', () => {
         const outputSpy = new OutputSpy()
         const ui = new Ui(inputSpy, outputSpy)
+
         ui.greet()
+
         expect(outputSpy.printedMessage()).
           toEqual('Welcome')
       })
@@ -415,24 +426,6 @@ fetchData() {
           </aside>
         </section>
 
-        <!--<section>-->
-          <!--<h3>Mock</h3>-->
-          <!--<ul>-->
-            <!--<li>verifies behaviour</li>-->
-            <!--<li>is often used in test libraries</li>-->
-          <!--</ul>-->
-          <!--<aside class="notes">-->
-          <!--</aside>-->
-        <!--</section>-->
-
-        <!--<section>-->
-          <!--<pre><code>-->
-          <!--</code></pre>-->
-          <!--<aside class="notes">-->
-            <!--- here's an example form my Rock Paper Scissors game-->
-          <!--</aside>-->
-        <!--</section>-->
-
         <section>
           <h3>Fake</h3>
           <ul>
@@ -446,6 +439,7 @@ fetchData() {
             - sometimes we even write tests for fakes if they have logic
           </aside>
         </section>
+
         <section>
           <h3>Fake example</h3>
           <pre><code>
@@ -471,9 +465,9 @@ fetchData() {
           }
           </code></pre>
           <aside class="notes">
-            - but it's probably easier if I show you directly in the code
           </aside>
         </section>
+
         <section>
           <h3>Double</h3>
           <ul>
@@ -485,15 +479,17 @@ fetchData() {
             - in that case I would give it the generic term double
           </aside>
         </section>
+
         <section>
-          <p>Please note: this is not quite so easy with typed languages.</p>
+          <p>Side note: this is not quite so easy with typed languages.</p>
           <aside class="notes">
             - do we have any fans of TypeScript in the room?
             - anyone who has used TypeScript but is not a fan?
           </aside>
         </section>
+
         <section>
-          <h3>Test frameworks have all this inbuilt</h3>
+          <h3>Test frameworks have all this built in</h3>
           <aside class="notes">
             - I don't write my own test doubles all the time
             - but I thought it would be interesting to demo this in this presentation
@@ -501,6 +497,7 @@ fetchData() {
             - but hopefully this has helped you to understand better what's happening under the hood
           </aside>
         </section>
+
         <section>
           <h2>Thank you!</h2>
           <p>@aebaR</p>
